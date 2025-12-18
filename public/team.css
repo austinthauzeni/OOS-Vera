@@ -196,7 +196,7 @@ active > a {
   position: relative;
   height: 100vh;
   min-height: 600px;
-  background-image: url('/images/Gemini_Generated_Image_xygawsxygawsxyga.png'); 
+  background-image: url('/public/images/Gemini_Generated_Image_xygawsxygawsxyga.png'); 
   background-size: cover;
   background-position: center;
   background-attachment: fixed; 
