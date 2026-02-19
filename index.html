@@ -498,7 +498,7 @@
       
  <script>
   (function(d,t) {
-    var BASE_URL = "https://webhooks.nbs.mw";
+    var BASE_URL = "https://webhooks.nbs.mw";  // Keep this as is
     var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
     g.src = BASE_URL + "/packs/js/sdk.js";
     g.async = true;
@@ -507,7 +507,7 @@
     g.onload = function() {
       window.chatwootSDK.run({
         websiteToken: 'Qbo8C3QujGZ5H1ZRuMbUTAX3',
-        baseUrl: window.location.origin // THIS IS THE FIX
+        baseUrl: 'https://webhooks.nbs.mw'  // Explicitly set full URL with protocol
       });
     };
   })(document,"script");
