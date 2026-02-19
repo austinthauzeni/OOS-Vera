@@ -497,34 +497,58 @@
         </div>
       
 <script>
-  (function(d,t) {
+(function() {
+    // Configuration
     var BASE_URL = "https://webhooks.nbs.mw";
-    console.log('Original BASE_URL:', BASE_URL);
+    var TOKEN = "Qbo8C3QujGZ5H1ZRuMbUTAX3";
     
-    var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-    g.src = BASE_URL + "/packs/js/sdk.js";
-    g.async = true;
-    g.defer = true;
-    s.parentNode.insertBefore(g,s);
+    // Create widget holder (hidden initially)
+    var holder = document.createElement('div');
+    holder.id = "cw-widget-holder";
+    holder.className = "woot-widget-holder woot--hide woot-elements--right";
+    holder.style.cssText = "box-shadow:0 5px 40px rgba(0,0,0,.16);opacity:1;overflow:hidden!important;position:fixed!important;transition:opacity .2s linear,transform .25s linear;z-index:2147483000!important;border-radius:16px;bottom:104px;height:calc(90% - 64px - 20px);max-height:640px!important;min-height:250px!important;width:400px!important;right:20px;";
     
-    g.onload = function() {
-      console.log('SDK loaded, initializing with:', {
-        token: 'Qbo8C3QujGZ5H1ZRuMbUTAX3',
-        baseUrl: BASE_URL
-      });
-      
-      window.chatwootSDK.run({
-        websiteToken: 'Qbo8C3QujGZ5H1ZRuMbUTAX3',
-        baseUrl: BASE_URL
-      });
+    // Create iframe
+    var iframe = document.createElement('iframe');
+    iframe.src = BASE_URL + '/widget?website_token=' + TOKEN;
+    iframe.allow = "camera;microphone;fullscreen;display-capture;picture-in-picture;clipboard-write;";
+    iframe.id = "chatwoot_live_chat_widget";
+    iframe.style.cssText = "border:0;height:100%!important;width:100%!important;max-height:100vh!important;";
+    
+    holder.appendChild(iframe);
+    document.body.appendChild(holder);
+    
+    // Create bubble button (visible by default)
+    var bubble = document.createElement('button');
+    bubble.className = "woot-widget-bubble woot-elements--right";
+    bubble.style.cssText = "background:#1f93ff;border-radius:100px;border-width:0;bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,.16)!important;cursor:pointer;height:64px;padding:0;position:fixed;user-select:none;width:64px;z-index:2147483000!important;overflow:hidden;right:20px;display:block;visibility:visible;opacity:1;";
+    bubble.innerHTML = '<svg id="woot-widget-bubble-icon" width="24" height="24" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M240.808 240.808H122.123C56.6994 240.808 3.45695 187.562 3.45695 122.122C3.45695 56.7031 56.6994 3.45697 122.124 3.45697C187.566 3.45697 240.808 56.7031 240.808 122.122V240.808Z" fill="#FFFFFF"/></svg>';
+    
+    // Toggle functionality
+    bubble.onclick = function() {
+        if (holder.classList.contains('woot--hide')) {
+            holder.classList.remove('woot--hide');
+            bubble.classList.add('woot--hide');
+        } else {
+            holder.classList.add('woot--hide');
+            bubble.classList.remove('woot--hide');
+        }
     };
     
-    g.onerror = function(e) {
-      console.error('Failed to load SDK:', e);
-    };
-  })(document,"script");
+    document.body.appendChild(bubble);
+    
+    // Close button inside iframe (optional - communicates with iframe)
+    window.addEventListener('message', function(event) {
+        if (event.data && typeof event.data === 'string' && event.data.includes('chatwoot-widget:')) {
+            var data = JSON.parse(event.data.replace('chatwoot-widget:', ''));
+            if (data.event === 'close-window') {
+                holder.classList.add('woot--hide');
+                bubble.classList.remove('woot--hide');
+            }
+        }
+    });
+})();
 </script>
-
       </div> <div class="contact-image">
         <img src="/public/images/1.png" alt="Our Location">
       </div>
