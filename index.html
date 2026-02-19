@@ -498,15 +498,14 @@
       
 <script>
 (function() {
-    // Configuration
     var BASE_URL = "https://webhooks.nbs.mw";
     var TOKEN = "Qbo8C3QujGZ5H1ZRuMbUTAX3";
     
-    // Create widget holder (HIDDEN by default)
+    // Create holder (VISIBLE by default like the working version)
     var holder = document.createElement('div');
     holder.id = "cw-widget-holder";
-    holder.className = "woot-widget-holder woot--hide woot-elements--right";
-    holder.style.cssText = "box-shadow:0 5px 40px rgba(0,0,0,.16);opacity:1;overflow:hidden!important;position:fixed!important;transition:opacity .2s linear,transform .25s linear;z-index:2147483000!important;border-radius:16px;bottom:104px;height:calc(90% - 64px - 20px);max-height:640px!important;min-height:250px!important;width:400px!important;right:20px;";
+    holder.className = "woot-widget-holder woot-elements--right";
+    holder.style.cssText = "box-shadow:0 5px 40px rgba(0,0,0,.16);opacity:1;overflow:hidden!important;position:fixed!important;z-index:2147483000!important;border-radius:16px;bottom:104px;height:calc(90% - 64px - 20px);max-height:640px!important;min-height:250px!important;width:400px!important;right:20px;display:none;"; // Hidden by CSS
     
     // Create iframe
     var iframe = document.createElement('iframe');
@@ -518,42 +517,30 @@
     holder.appendChild(iframe);
     document.body.appendChild(holder);
     
-    // Create bubble button (visible by default)
+    // Create bubble
     var bubble = document.createElement('button');
     bubble.className = "woot-widget-bubble woot-elements--right";
-    bubble.style.cssText = "background:#1f93ff;border-radius:100px;border-width:0;bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,.16)!important;cursor:pointer;height:64px;padding:0;position:fixed;user-select:none;width:64px;z-index:2147483000!important;overflow:hidden;right:20px;display:block;visibility:visible;opacity:1;";
-    bubble.innerHTML = '<svg id="woot-widget-bubble-icon" width="24" height="24" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M240.808 240.808H122.123C56.6994 240.808 3.45695 187.562 3.45695 122.122C3.45695 56.7031 56.6994 3.45697 122.124 3.45697C187.566 3.45697 240.808 56.7031 240.808 122.122V240.808Z" fill="#FFFFFF"/></svg>';
+    bubble.style.cssText = "background:#1f93ff;border-radius:100px;border-width:0;bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,.16)!important;cursor:pointer;height:64px;padding:0;position:fixed;user-select:none;width:64px;z-index:2147483000!important;overflow:hidden;right:20px;display:block;";
+    bubble.innerHTML = '<svg width="24" height="24" viewBox="0 0 240 240" fill="none"><path d="M240.808 240.808H122.123C56.6994 240.808 3.45695 187.562 3.45695 122.122C3.45695 56.7031 56.6994 3.45697 122.124 3.45697C187.566 3.45697 240.808 56.7031 240.808 122.122V240.808Z" fill="#FFFFFF"/></svg>';
     
-    // Toggle functionality
+    // Toggle with simple display property
     bubble.onclick = function() {
-        console.log('Bubble clicked'); // Debug
-        holder.classList.remove('woot--hide'); // Show holder
-        bubble.style.display = 'none'; // Hide bubble completely
+        holder.style.display = 'block';  // Show holder
+        bubble.style.display = 'none';    // Hide bubble
     };
     
     document.body.appendChild(bubble);
     
-    // Close button inside iframe
+    // Listen for close events
     window.addEventListener('message', function(event) {
         if (event.data && typeof event.data === 'string' && event.data.includes('chatwoot-widget:')) {
             try {
                 var data = JSON.parse(event.data.replace('chatwoot-widget:', ''));
-                console.log('Message received:', data); // Debug
                 if (data.event === 'close-window') {
-                    holder.classList.add('woot--hide'); // Hide holder
-                    bubble.style.display = 'block'; // Show bubble
+                    holder.style.display = 'none';  // Hide holder
+                    bubble.style.display = 'block';  // Show bubble
                 }
-            } catch(e) {
-                console.log('Message parsing error:', e);
-            }
-        }
-    });
-    
-    // Also handle close from inside widget
-    window.addEventListener('message', function(event) {
-        if (event.data && event.data.event === 'closed-widget') {
-            holder.classList.add('woot--hide');
-            bubble.style.display = 'block';
+            } catch(e) {}
         }
     });
 })();
