@@ -496,11 +496,12 @@
           </div>
         </div>
         <h1> Script is here</h1>
-        <script>
+   <script>
   (function(d,t) {
-    var BASE_URL="https://webhooks.nbs.mw";
+    var BASE_URL = "https://webhooks.nbs.mw"; 
     var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
     g.src=BASE_URL+"/packs/js/sdk.js";
+    g.defer = true;
     g.async = true;
     s.parentNode.insertBefore(g,s);
     g.onload=function(){
@@ -511,6 +512,7 @@
     }
   })(document,"script");
 </script>
+
       </div> <div class="contact-image">
         <img src="/public/images/1.png" alt="Our Location">
       </div>
