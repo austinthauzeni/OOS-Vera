@@ -495,21 +495,35 @@
             </span>
           </div>
         </div>
-        <h1> Script is here</h1>
-   <script>
+      
+ <script>
   (function(d,t) {
-    var BASE_URL = "https://webhooks.nbs.mw"; 
+    var BASE_URL="https://webhooks.nbs.mw";
     var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
     g.src=BASE_URL+"/packs/js/sdk.js";
     g.defer = true;
     g.async = true;
+    g.crossOrigin = "anonymous"; // Add this
     s.parentNode.insertBefore(g,s);
     g.onload=function(){
-      window.chatwootSDK.run({
-        websiteToken: 'Qbo8C3QujGZ5H1ZRuMbUTAX3',
-        baseUrl: BASE_URL
-      })
-    }
+      try {
+        window.chatwootSDK.run({
+          websiteToken: 'Qbo8C3QujGZ5H1ZRuMbUTAX3',
+          baseUrl: BASE_URL,
+          // Add these options
+          locale: 'en',
+          type: 'standard', // or 'expanded_bubble'
+          hideMessageBubble: false,
+          position: 'right', // or 'left'
+        });
+        console.log('Chatwoot SDK loaded successfully');
+      } catch (error) {
+        console.error('Chatwoot SDK failed to load:', error);
+      }
+    };
+    g.onerror = function() {
+      console.error('Failed to load Chatwoot SDK from:', BASE_URL);
+    };
   })(document,"script");
 </script>
 
