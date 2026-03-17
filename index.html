@@ -497,23 +497,78 @@
         </div>
       
 <script>
-  (function(d,t) {
+(function(d,t) {
     var BASE_URL = "https://webhooks.nbs.mw";
+    var TOKEN = "9jLMDP4E5JXJGBrx9RHQo4zb";
+    
+    // Load the SDK
     var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
     g.src = BASE_URL + "/packs/js/sdk.js";
     g.defer = true;
     g.async = true;
     s.parentNode.insertBefore(g, s);
+    
+    // Function to create bubble manually (fallback)
+    function createManualBubble() {
+        if (document.querySelector('.woot-widget-bubble')) return;
+        
+        console.log('Creating manual bubble fallback...');
+        var bubble = document.createElement('button');
+        bubble.className = "woot-widget-bubble woot-elements--right woot--close";
+        bubble.style.cssText = "background:#1f93ff;border-radius:100px;border-width:0;bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,.16)!important;cursor:pointer;height:64px;padding:0;position:fixed;user-select:none;width:64px;z-index:2147483000!important;overflow:hidden;right:20px;display:block;";
+        bubble.innerHTML = '<svg width="24" height="24" viewBox="0 0 240 240" fill="none"><path d="M240.808 240.808H122.123C56.6994 240.808 3.45695 187.562 3.45695 122.122C3.45695 56.7031 56.6994 3.45697 122.124 3.45697C187.566 3.45697 240.808 56.7031 240.808 122.122V240.808Z" fill="#FFFFFF"/></svg>';
+        
+        bubble.onclick = function() {
+            var holder = document.querySelector('.woot-widget-holder');
+            if (holder) {
+                holder.style.display = 'block';
+                bubble.style.display = 'none';
+                if (window.$chatwoot) window.$chatwoot.isOpen = true;
+            }
+        };
+        
+        document.body.appendChild(bubble);
+        
+        // Also ensure holder exists and is hidden initially
+        var holder = document.querySelector('.woot-widget-holder');
+        if (holder) {
+            holder.style.display = 'none';
+        }
+    }
+    
+    // Try SDK first, but have fallback ready
+    var fallbackTimer = setTimeout(createManualBubble, 3000);
+    
     g.onload = function() {
-      window.chatwootSDK.run({
-        websiteToken: '9jLMDP4E5JXJGBrx9RHQo4zb',
-        baseUrl: BASE_URL
-      });
-      
-      // Optional: Make BASE_URL available globally if needed
-      window.CHATWOOT_BASE_URL = BASE_URL;
+        clearTimeout(fallbackTimer);
+        try {
+            window.chatwootSDK.run({
+                websiteToken: TOKEN,
+                baseUrl: BASE_URL
+            });
+            
+            // Check if bubble was created by SDK after a delay
+            setTimeout(function() {
+                if (!document.querySelector('.woot-widget-bubble')) {
+                    createManualBubble();
+                } else {
+                    // Ensure holder is hidden initially
+                    var holder = document.querySelector('.woot-widget-holder');
+                    if (holder) holder.style.display = 'none';
+                }
+            }, 2000);
+        } catch (e) {
+            console.error('Chatwoot SDK error:', e);
+            createManualBubble();
+        }
     };
-  })(document, "script");
+    
+    g.onerror = function() {
+        clearTimeout(fallbackTimer);
+        console.error('Failed to load Chatwoot SDK');
+        createManualBubble();
+    };
+})(document, "script");
 </script>
 
       </div> <div class="contact-image">
