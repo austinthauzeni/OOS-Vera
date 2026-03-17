@@ -508,32 +508,76 @@
     g.async = true;
     s.parentNode.insertBefore(g, s);
     
-    // Function to create bubble manually (fallback)
+    // Function to create bubble manually
     function createManualBubble() {
         if (document.querySelector('.woot-widget-bubble')) return;
         
-        console.log('Creating manual bubble fallback...');
+        console.log('Creating manual bubble...');
+        
+        // Create bubble
         var bubble = document.createElement('button');
         bubble.className = "woot-widget-bubble woot-elements--right woot--close";
-        bubble.style.cssText = "background:#1f93ff;border-radius:100px;border-width:0;bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,.16)!important;cursor:pointer;height:64px;padding:0;position:fixed;user-select:none;width:64px;z-index:2147483000!important;overflow:hidden;right:20px;display:block;";
+        bubble.style.cssText = "background:#1f93ff;border-radius:100px;border-width:0;bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,.16)!important;cursor:pointer;height:64px;padding:0px;position:fixed;user-select:none;width:64px;z-index:2147483000!important;overflow:hidden;right:20px;display:block;";
         bubble.innerHTML = '<svg width="24" height="24" viewBox="0 0 240 240" fill="none"><path d="M240.808 240.808H122.123C56.6994 240.808 3.45695 187.562 3.45695 122.122C3.45695 56.7031 56.6994 3.45697 122.124 3.45697C187.566 3.45697 240.808 56.7031 240.808 122.122V240.808Z" fill="#FFFFFF"/></svg>';
         
-        bubble.onclick = function() {
-            var holder = document.querySelector('.woot-widget-holder');
+        // Create holder if it doesn't exist
+        var holder = document.querySelector('.woot-widget-holder');
+        if (!holder) {
+            holder = document.createElement('div');
+            holder.className = "woot-widget-holder woot-elements--right";
+            holder.style.cssText = "box-shadow:0 5px 40px rgba(0,0,0,.16);opacity:1;overflow:hidden!important;position:fixed!important;transition:opacity 0.2s linear,transform 0.25s linear;z-index:2147483000!important;border-radius:16px;bottom:104px;height:calc(90% - 64px - 20px);max-height:640px!important;min-height:250px!important;width:400px!important;right:20px;display:none;";
+            
+            // Create iframe
+            var iframe = document.createElement('iframe');
+            iframe.src = BASE_URL + '/widget?website_token=' + TOKEN;
+            iframe.allow = "camera;microphone;fullscreen;display-capture;picture-in-picture;clipboard-write;";
+            iframe.id = "chatwoot_live_chat_widget";
+            iframe.style.cssText = "border:0;height:100%!important;width:100%!important;max-height:100vh!important;";
+            
+            holder.appendChild(iframe);
+            document.body.appendChild(holder);
+        }
+        
+        // Click handler for bubble
+        bubble.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('Bubble clicked - showing holder');
+            
+            // Hide bubble
+            bubble.style.display = 'none';
+            
+            // Show holder
             if (holder) {
                 holder.style.display = 'block';
-                bubble.style.display = 'none';
-                if (window.$chatwoot) window.$chatwoot.isOpen = true;
+                console.log('Holder display set to:', holder.style.display);
+            }
+            
+            // Notify SDK about open state
+            if (window.$chatwoot) {
+                window.$chatwoot.isOpen = true;
             }
         };
         
         document.body.appendChild(bubble);
         
-        // Also ensure holder exists and is hidden initially
-        var holder = document.querySelector('.woot-widget-holder');
-        if (holder) {
-            holder.style.display = 'none';
-        }
+        // Setup message listener for close events
+        window.addEventListener('message', function(event) {
+            if (event.data && typeof event.data === 'string' && event.data.includes('chatwoot-widget:')) {
+                try {
+                    var data = JSON.parse(event.data.replace('chatwoot-widget:', ''));
+                    if (data.event === 'close-window') {
+                        console.log('Close event received');
+                        if (holder) holder.style.display = 'none';
+                        if (bubble) bubble.style.display = 'block';
+                        if (window.$chatwoot) window.$chatwoot.isOpen = false;
+                    }
+                } catch(e) {}
+            }
+        });
+        
+        console.log('Bubble and holder setup complete');
     }
     
     // Try SDK first, but have fallback ready
@@ -547,14 +591,29 @@
                 baseUrl: BASE_URL
             });
             
-            // Check if bubble was created by SDK after a delay
+            // After SDK loads, check if we need fallback
             setTimeout(function() {
                 if (!document.querySelector('.woot-widget-bubble')) {
                     createManualBubble();
                 } else {
-                    // Ensure holder is hidden initially
+                    // SDK created bubble, but we need to ensure proper click handling
+                    var sdkBubble = document.querySelector('.woot-widget-bubble');
                     var holder = document.querySelector('.woot-widget-holder');
-                    if (holder) holder.style.display = 'none';
+                    
+                    if (sdkBubble && holder) {
+                        // Ensure holder is hidden initially
+                        holder.style.display = 'none';
+                        
+                        // Add additional click handler if needed
+                        sdkBubble.addEventListener('click', function(e) {
+                            // Let SDK handle first, but ensure holder shows
+                            setTimeout(function() {
+                                if (holder.style.display !== 'block') {
+                                    holder.style.display = 'block';
+                                }
+                            }, 100);
+                        });
+                    }
                 }
             }, 2000);
         } catch (e) {
@@ -569,6 +628,18 @@
         createManualBubble();
     };
 })(document, "script");
+
+// Add this CSS to ensure holder displays properly
+var style = document.createElement('style');
+style.innerHTML = `
+    .woot-widget-holder {
+        display: none !important;
+    }
+    .woot-widget-holder[style*="display: block"] {
+        display: block !important;
+    }
+`;
+document.head.appendChild(style);
 </script>
 
       </div> <div class="contact-image">
