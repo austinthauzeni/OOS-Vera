@@ -496,22 +496,24 @@
           </div>
         </div>
       
-<!-- Paste this exactly as is before your </body> tag -->
 <script>
   (function(d,t) {
-    var BASE_URL="https://webhooks.nbs.mw";
-    var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-    g.src=BASE_URL+"/packs/js/sdk.js";
+    var BASE_URL = "https://webhooks.nbs.mw";
+    var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+    g.src = BASE_URL + "/packs/js/sdk.js";
     g.defer = true;
     g.async = true;
-    s.parentNode.insertBefore(g,s);
-    g.onload=function(){
+    s.parentNode.insertBefore(g, s);
+    g.onload = function() {
       window.chatwootSDK.run({
         websiteToken: '9jLMDP4E5JXJGBrx9RHQo4zb',
         baseUrl: BASE_URL
-      })
-    }
-  })(document,"script");
+      });
+      
+      // Optional: Make BASE_URL available globally if needed
+      window.CHATWOOT_BASE_URL = BASE_URL;
+    };
+  })(document, "script");
 </script>
 
       </div> <div class="contact-image">
